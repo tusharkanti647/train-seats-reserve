@@ -1,4 +1,5 @@
 import { Box, Button, TextField } from "@mui/material";
+import Lodar from "../Lodar";
 
 const { useState } = require("react");
 
@@ -7,7 +8,8 @@ function From({setUserData}) {
     const [inputData, seatInputData] = useState({
         userName: "",
         seatCount: 0,
-    })
+    });
+    const [isLodarShow, setIsLodarShow] = useState(false);
 
 
     //handel control input
@@ -25,23 +27,36 @@ function From({setUserData}) {
         try{
             const {userName, seatCount}= inputData;
 
-            if(!userName || seatCount<=0){
-                alert("Please enter correct value in the fill");
+            //if userName is not provided or number of seatCount is not between 1 to 7 it return
+            if(!userName){
+                alert("Please enter user name");
                 return;
             }
-            const response = await fetch("http://localhost:8000/seats-reserved", {
+            if(seatCount<=0 || seatCount>7){
+                alert("Enter number of seat between 1 to 7");
+                return;
+            }
+            setIsLodarShow(true);
+            const response = await fetch("https://train-seats-reserve.onrender.com/seats-reserved", {
                 method: "PUT",
                 headers:{"Content-Type": "application/json"},
                 body: JSON.stringify({userName, seatCount})
             });
-
             const userData = await response.json();
-            setUserData({userName: userData.userName, seatsData: userData.seatsData});
+            setIsLodarShow(false);
+            //set the response
+            setUserData({userName: userData.seatData.userName, seatsData: userData.seatData.seatsData, message: userData.message});
             seatInputData({userName: "", seatCount: 0,});
         }catch(err){
             console.log(err);
         }
     }
+
+    //render the the lodar
+    if(isLodarShow){
+        return(<Lodar />);
+    }
+
 
     //render the input fill
     //------------------------------------------------------------------------------

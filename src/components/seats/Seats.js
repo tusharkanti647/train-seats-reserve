@@ -2,6 +2,7 @@ import EventSeatIcon from '@mui/icons-material/EventSeat';
 
 import "./Seats.css";
 import { useEffect, useState } from "react";
+import Lodar from '../Lodar';
 
 
 //give the color 
@@ -13,18 +14,30 @@ const otherUserSeatsColor={color:"brown"}
 
 function Seats({userData}) {
     const [seats, setSeats]=useState([]);
+    const [isLodarShow, setIsLodarShow] = useState(false);
 
-    //
+    //fetch the seats from db
+    //----------------------------------------------------------------------------------------
     useEffect(()=>{
         const fetchFun= async ()=>{
-            const response = await fetch("http://localhost:8000/seats-get");
+            setIsLodarShow(true);
+            const response = await fetch("https://train-seats-reserve.onrender.com/seats-get");
             const data = await response.json();
+            setIsLodarShow(false);
             setSeats(data);
         }
         fetchFun();
-    },[userData.userName]);
+    },[userData.userName, userData.seatsData]);
     
 
+
+    //render the the lodar
+    if(isLodarShow){
+        return(<Lodar />);
+    }
+
+    //render the seats
+    //------------------------------------------------------------------------------------------------
     return (<div style={{marginTop:'30px'}}>
         <div className="box-container">
             {seats.map((seat) => (
